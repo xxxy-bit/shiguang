@@ -1,59 +1,24 @@
-import json
 import os
-import hashlib
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse, HTMLResponse, PlainTextResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, PlainTextResponse
 
 from database import init_db, add_quote, get_random_quote, get_all_quotes, get_quote_count, delete_quote
 from database import add_schedule, get_schedules, toggle_schedule, delete_schedule
 from models import QuoteCreate, ScheduleCreate, ScheduleToggle
-from feishu_bot import handle_message_event
 
 load_dotenv()
 
-app = FastAPI(title="Quote Widget")
+app = FastAPI(title="拾光")
 
-VERIFICATION_TOKEN = os.getenv("FEISHU_VERIFICATION_TOKEN", "")
+__all__ = ["app"]
 
 
 @app.on_event("startup")
 def startup():
     init_db()
     os.makedirs("static", exist_ok=True)
-
-
-# ====== 飞书 Bot 事件回调 ======
-
-@app.post("/feishu/event")
-async def feishu_event(request: Request):
-    body = await request.body()
-    data = json.loads(body)
-
-    # URL 验证（首次配置事件订阅时飞书会发 challenge）
-    if data.get("type") == "url_verification":
-        challenge = data.get("challenge", "")
-        return JSONResponse({"challenge": challenge})
-
-    # 签名校验
-    timestamp = request.headers.get("X-Lark-Request-Timestamp", "")
-    nonce = request.headers.get("X-Lark-Request-Nonce", "")
-    signature = request.headers.get("X-Lark-Signature", "")
-
-    raw = f"{timestamp}{nonce}{VERIFICATION_TOKEN}{body.decode('utf-8')}"
-    expected = hashlib.sha256(raw.encode()).hexdigest()
-    if expected != signature:
-        raise HTTPException(status_code=403, detail="signature mismatch")
-
-    # 处理消息事件
-    event = data.get("event", {})
-    if data.get("header", {}).get("event_type") == "im.message.receive_v1":
-        result = handle_message_event(event)
-        return JSONResponse(result)
-
-    return JSONResponse({"code": 0})
 
 
 # ====== 句子 CRUD API ======
