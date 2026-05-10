@@ -9,7 +9,6 @@ shiguang/
 ├── server/          # FastAPI 后端
 │   ├── main.py      # API 服务（句子 + 日程）
 │   ├── database.py  # SQLite 数据层
-│   ├── feishu_bot.py # 飞书 Bot 集成
 │   └── models.py    # 数据模型
 ├── android/         # Android App
 │   └── app/src/     # Kotlin 源码
@@ -18,9 +17,9 @@ shiguang/
 
 ## 功能
 
-- 飞书 Bot 输入句子
+- App 内输入保存句子
 - Android 桌面小组件随机展示
-- App 内管理句子和日程
+- 句子和日程管理
 - 小组件样式自定义
 
 ## 部署
