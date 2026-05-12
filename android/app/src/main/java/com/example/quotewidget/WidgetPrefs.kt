@@ -36,4 +36,12 @@ object WidgetPrefs {
 
     fun setCornerRadius(ctx: Context, radius: Float) =
         prefs(ctx).edit().putFloat(KEY_CORNER, radius).apply()
+
+    private const val KEY_MAX_CHARS = "max_chars"
+
+    fun getMaxChars(ctx: Context): Int =
+        prefs(ctx).getInt(KEY_MAX_CHARS, 100)
+
+    fun setMaxChars(ctx: Context, chars: Int) =
+        prefs(ctx).edit().putInt(KEY_MAX_CHARS, chars).apply()
 }

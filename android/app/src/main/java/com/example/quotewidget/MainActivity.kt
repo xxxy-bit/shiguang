@@ -4,10 +4,13 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.DialogInterface
 import android.graphics.Paint
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -79,13 +82,17 @@ class MainActivity : AppCompatActivity() {
         cornerSeek.progress = ((savedCorner / 40) * 100).toInt()
         cornerLabel.text = "圆角: ${savedCorner.toInt()}dp"
 
+        val maxCharsSeek = page.findViewById<SeekBar>(R.id.max_chars_seek)
+        val maxCharsLabel = page.findViewById<TextView>(R.id.max_chars_label)
+        val savedMaxChars = WidgetPrefs.getMaxChars(this)
+        maxCharsSeek.progress = ((savedMaxChars - 20) / 380f * 100).toInt().coerceIn(0, 100)
+        maxCharsLabel.text = "小组件最多显示: ${savedMaxChars}字"
+
         val savedColor = WidgetPrefs.getTextColor(this)
         for ((color, name) in presetColors) {
             val chip = layoutInflater.inflate(R.layout.color_chip, colorContainer, false)
             val dot = chip.findViewById<View>(R.id.color_dot)
-            val label = chip.findViewById<TextView>(R.id.color_label)
             dot.setBackgroundColor(color.toInt())
-            label.text = name
             if (color == savedColor.toLong()) chip.isSelected = true
             chip.setOnClickListener {
                 for (i in 0 until colorContainer.childCount) {
@@ -96,7 +103,9 @@ class MainActivity : AppCompatActivity() {
                 WidgetPrefs.setTextColor(this@MainActivity, color.toInt())
                 updateWidget()
             }
-            colorContainer.addView(chip)
+            // Distribute evenly
+            val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            colorContainer.addView(chip, params)
         }
 
         page.findViewById<Button>(R.id.btn_add).setOnClickListener {
@@ -139,6 +148,19 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        maxCharsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(s: SeekBar, p: Int, fromUser: Boolean) {
+                val chars = (20 + p / 100f * 380).toInt()
+                maxCharsLabel.text = "小组件最多显示: ${chars}字"
+            }
+            override fun onStartTrackingTouch(s: SeekBar) {}
+            override fun onStopTrackingTouch(s: SeekBar) {
+                val chars = (20 + s.progress / 100f * 380).toInt()
+                WidgetPrefs.setMaxChars(this@MainActivity, chars)
+                updateWidget()
+            }
+        })
+
         loadQuotes(listContainer, statsText)
     }
 
@@ -152,16 +174,42 @@ class MainActivity : AppCompatActivity() {
                     val item = layoutInflater.inflate(R.layout.item_quote, listContainer, false)
                     item.findViewById<TextView>(R.id.quote_text).text = q.text
                     item.findViewById<TextView>(R.id.quote_meta).text = "#${q.id}  ${q.created_at}"
-                    item.findViewById<ImageButton>(R.id.btn_delete).setOnClickListener {
+                    item.findViewById<ImageView>(R.id.btn_delete).setOnClickListener {
                         thread {
                             QuoteApi.delete(q.id)
                             runOnUiThread { loadQuotes(listContainer, statsText) }
                         }
                     }
+                    item.findViewById<ImageView>(R.id.btn_edit).setOnClickListener {
+                        showEditDialog(q.id, q.text, listContainer, statsText)
+                    }
                     listContainer.addView(item)
                 }
             }
         }
+    }
+
+    private fun showEditDialog(id: Int, oldText: String, listContainer: LinearLayout, statsText: TextView) {
+        val input = EditText(this).apply {
+            setText(oldText)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setPadding(40, 40, 40, 40)
+            textSize = 15f
+        }
+        AlertDialog.Builder(this)
+            .setTitle("编辑句子")
+            .setView(input)
+            .setPositiveButton("保存") { _, _ ->
+                val newText = input.text.toString().trim()
+                if (newText.isNotEmpty()) {
+                    thread {
+                        QuoteApi.update(id, newText)
+                        runOnUiThread { loadQuotes(listContainer, statsText) }
+                    }
+                }
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     // ====== Schedule Page ======
@@ -222,7 +270,7 @@ class MainActivity : AppCompatActivity() {
                     val cb = item.findViewById<CheckBox>(R.id.sch_done)
                     val titleView = item.findViewById<TextView>(R.id.sch_item_title)
                     val dateView = item.findViewById<TextView>(R.id.sch_item_date)
-                    val delBtn = item.findViewById<ImageButton>(R.id.sch_delete)
+                    val delBtn = item.findViewById<ImageView>(R.id.sch_delete)
 
                     cb.isChecked = s.done == 1
                     titleView.text = s.title

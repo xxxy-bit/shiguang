@@ -136,6 +136,22 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:id="@+id/max_chars_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="小组件最多显示: 100字"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <SeekBar
+                android:id="@+id/max_chars_seek"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="50"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="文字颜色"

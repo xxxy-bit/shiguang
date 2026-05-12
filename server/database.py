@@ -83,6 +83,14 @@ def delete_quote(qid: int) -> bool:
     return deleted
 
 
+def update_quote(qid: int, text: str) -> bool:
+    conn = get_db()
+    conn.execute("UPDATE quotes SET text = ? WHERE id = ?", (text, qid))
+    conn.commit()
+    conn.close()
+    return True
+
+
 # ====== Schedule Operations ======
 
 def add_schedule(title: str, date: str = "", time: str = "") -> int:

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, PlainTextResponse
 
-from database import init_db, add_quote, get_random_quote, get_all_quotes, get_quote_count, delete_quote
+from database import init_db, add_quote, get_random_quote, get_all_quotes, get_quote_count, delete_quote, update_quote
 from database import add_schedule, get_schedules, toggle_schedule, delete_schedule
 from models import QuoteCreate, ScheduleCreate, ScheduleToggle
 
@@ -57,6 +57,12 @@ def remove_quote(qid: int):
     if not delete_quote(qid):
         raise HTTPException(status_code=404, detail="句子不存在")
     return {"msg": "deleted"}
+
+
+@app.put("/quotes/{qid}")
+def edit_quote(qid: int, q: QuoteCreate):
+    update_quote(qid, q.text)
+    return {"msg": "ok"}
 
 
 # ====== 日程 CRUD API ======

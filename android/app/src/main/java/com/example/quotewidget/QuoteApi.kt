@@ -70,6 +70,20 @@ object QuoteApi {
         } catch (_: Exception) { false }
     }
 
+    fun update(id: Int, text: String): Boolean {
+        return try {
+            val url = URL("$BASE/quotes/$id")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.connectTimeout = 5000
+            conn.doOutput = true
+            conn.requestMethod = "PUT"
+            conn.setRequestProperty("Content-Type", "application/json")
+            val body = JSONObject().put("text", text).toString()
+            OutputStreamWriter(conn.outputStream, "UTF-8").use { it.write(body) }
+            conn.responseCode == 200
+        } catch (_: Exception) { false }
+    }
+
     // ====== Schedule APIs ======
 
     data class Schedule(val id: Int, val title: String, val date: String, val time: String, val done: Int)

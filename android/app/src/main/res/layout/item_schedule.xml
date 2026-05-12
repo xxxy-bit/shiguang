@@ -37,11 +37,15 @@
             android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <ImageButton
+    <ImageView
         android:id="@+id/sch_delete"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:src="@drawable/icon_delete"
+        android:scaleType="fitCenter"
+        android:padding="6dp"
+        android:clickable="true"
+        android:focusable="true"
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:contentDescription="删除" />
 </LinearLayout>
