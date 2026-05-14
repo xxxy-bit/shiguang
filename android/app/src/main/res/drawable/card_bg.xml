@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Card body - warm ivory -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FEFAF3" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- Top amber accent line -->
+    <item
+        android:top="0dp"
+        android:left="16dp"
+        android:right="16dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#C8945C" />
+            <corners
+                android:topLeftRadius="12dp"
+                android:topRightRadius="12dp" />
+            <size android:height="3dp" />
+        </shape>
+    </item>
+
+    <!-- Subtle inner glow at top -->
+    <item
+        android:top="3dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FEFAF3" />
+            <corners
+                android:bottomLeftRadius="12dp"
+                android:bottomRightRadius="12dp" />
+        </shape>
+    </item>
+
+</layer-list>

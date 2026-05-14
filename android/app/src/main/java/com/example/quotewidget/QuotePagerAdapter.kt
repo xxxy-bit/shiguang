@@ -10,14 +10,18 @@ class QuotePagerAdapter(
 ) : RecyclerView.Adapter<QuotePagerAdapter.PageHolder>() {
 
     private val pages = mutableListOf<View>()
+    private val layoutIds = intArrayOf(
+        R.layout.page_quotes,
+        R.layout.page_schedules,
+        R.layout.page_settings
+    )
 
     inner class PageHolder(val view: View) : RecyclerView.ViewHolder(view)
 
-    override fun getItemCount() = 2
+    override fun getItemCount() = 3
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageHolder {
-        val layoutId = if (viewType == 0) R.layout.page_quotes else R.layout.page_schedules
-        val view = inflater.inflate(layoutId, parent, false)
+        val view = inflater.inflate(layoutIds[viewType], parent, false)
         pages.add(view)
         return PageHolder(view)
     }
@@ -26,7 +30,5 @@ class QuotePagerAdapter(
 
     override fun getItemViewType(position: Int) = position
 
-    fun getPageView(position: Int): View = pages.getOrElse(position) {
-        throw IndexOutOfBoundsException("Page $position not created yet")
-    }
+    fun getPageView(position: Int): View? = pages.getOrNull(position)
 }

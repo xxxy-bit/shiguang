@@ -44,4 +44,12 @@ object WidgetPrefs {
 
     fun setMaxChars(ctx: Context, chars: Int) =
         prefs(ctx).edit().putInt(KEY_MAX_CHARS, chars).apply()
+
+    private const val KEY_INTERVAL = "auto_refresh_minutes"
+
+    fun getIntervalMinutes(ctx: Context): Int =
+        prefs(ctx).getInt(KEY_INTERVAL, 0)
+
+    fun setIntervalMinutes(ctx: Context, minutes: Int) =
+        prefs(ctx).edit().putInt(KEY_INTERVAL, minutes).apply()
 }

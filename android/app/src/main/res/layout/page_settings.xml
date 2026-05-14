@@ -4,5 +4,5 @@
     android:layout_height="match_parent"
     android:clipToPadding="false">
 
-    <include layout="@layout/section_quotes" />
+    <include layout="@layout/section_settings" />
 </androidx.core.widget.NestedScrollView>

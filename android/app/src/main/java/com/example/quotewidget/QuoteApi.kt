@@ -28,9 +28,9 @@ object QuoteApi {
         } catch (_: Exception) { null }
     }
 
-    fun fetchAll(): List<Quote> {
+    fun fetchAll(limit: Int = 20, offset: Int = 0): List<Quote> {
         return try {
-            val url = URL("$BASE/quotes?limit=200")
+            val url = URL("$BASE/quotes?limit=$limit&offset=$offset")
             val conn = url.openConnection() as HttpURLConnection
             conn.connectTimeout = 5000
             conn.readTimeout = 5000
