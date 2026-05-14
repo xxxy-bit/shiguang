@@ -11,7 +11,8 @@
         android:id="@+id/sch_done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginEnd="8dp"
+        android:buttonTint="#C8945C" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -24,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:textColor="#222"
+            android:textColor="#3D3226"
             android:maxLines="2"
             android:ellipsize="end" />
 
@@ -33,8 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:textColor="#888"
-            android:layout_marginTop="2dp" />
+            android:textColor="#9B8E7E"
+            android:layout_marginTop="3dp" />
     </LinearLayout>
 
     <ImageView
@@ -46,6 +47,7 @@
         android:padding="6dp"
         android:clickable="true"
         android:focusable="true"
+        android:alpha="0.5"
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:contentDescription="删除" />
 </LinearLayout>

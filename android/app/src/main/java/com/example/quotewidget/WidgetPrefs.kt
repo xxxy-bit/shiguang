@@ -20,13 +20,13 @@ object WidgetPrefs {
         prefs(ctx).edit().putFloat(KEY_FONT_SIZE, size).apply()
 
     fun getTextColor(ctx: Context): Int =
-        prefs(ctx).getInt(KEY_TEXT_COLOR, 0xFF333333.toInt())
+        prefs(ctx).getInt(KEY_TEXT_COLOR, 0xFF3D3226.toInt())
 
     fun setTextColor(ctx: Context, color: Int) =
         prefs(ctx).edit().putInt(KEY_TEXT_COLOR, color).apply()
 
     fun getBgColor(ctx: Context): Int =
-        prefs(ctx).getInt(KEY_BG_COLOR, 0xFFFFFFFF.toInt())
+        prefs(ctx).getInt(KEY_BG_COLOR, 0xFFFAF3E8.toInt())
 
     fun setBgColor(ctx: Context, color: Int) =
         prefs(ctx).edit().putInt(KEY_BG_COLOR, color).apply()

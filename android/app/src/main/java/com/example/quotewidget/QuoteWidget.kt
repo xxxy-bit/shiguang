@@ -51,11 +51,7 @@ class QuoteWidget : AppWidgetProvider() {
         // Fetch quote
         Thread {
             val text = QuoteApi.fetchRandomText()
-            val maxChars = WidgetPrefs.getMaxChars(context)
-            var displayText = text ?: context.getString(R.string.error)
-            if (displayText.length > maxChars) {
-                displayText = displayText.take(maxChars) + "…"
-            }
+            val displayText = text ?: context.getString(R.string.error)
             views.setTextViewText(R.id.quote_text, displayText)
             manager.updateAppWidget(widgetId, views)
         }.start()

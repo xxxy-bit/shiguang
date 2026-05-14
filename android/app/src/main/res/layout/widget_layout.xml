@@ -14,8 +14,9 @@
         android:layout_height="wrap_content"
         android:text="@string/loading"
         android:textSize="16sp"
-        android:textColor="#333333"
-        android:lineSpacingExtra="4dp"
+        android:textColor="#3D3226"
+        android:fontFamily="serif"
+        android:lineSpacingExtra="5dp"
         android:maxLines="5"
         android:ellipsize="end"
         android:gravity="center" />

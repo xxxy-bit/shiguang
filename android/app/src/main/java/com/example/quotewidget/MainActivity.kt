@@ -8,6 +8,8 @@ import android.content.DialogInterface
 import android.graphics.Paint
 import android.os.Bundle
 import android.text.InputType
+import android.text.TextWatcher
+import android.text.Editable
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -25,8 +27,8 @@ class MainActivity : AppCompatActivity() {
     private var schedulesPage: View? = null
 
     private val presetColors = listOf(
-        0xFF333333 to "深灰", 0xFF1A1A1A to "黑色", 0xFF1565C0 to "蓝色",
-        0xFF2E7D32 to "绿色", 0xFFC62828 to "红色", 0xFF6A1B9A to "紫色"
+        0xFF3D3226 to "深棕", 0xFF1A1A1A to "墨黑", 0xFF8B4513 to "赭石",
+        0xFF2E5D4C to "松绿", 0xFF8B2252 to "绛紫", 0xFF4A6572 to "黛蓝"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         val page = quotesPage ?: return
 
         val input = page.findViewById<EditText>(R.id.input_text)
+        val charCount = page.findViewById<TextView>(R.id.char_count)
         val statsText = page.findViewById<TextView>(R.id.stats)
         val listContainer = page.findViewById<LinearLayout>(R.id.list_container)
         val fontSizeSeek = page.findViewById<SeekBar>(R.id.font_size_seek)
@@ -81,12 +84,6 @@ class MainActivity : AppCompatActivity() {
         val savedCorner = WidgetPrefs.getCornerRadius(this)
         cornerSeek.progress = ((savedCorner / 40) * 100).toInt()
         cornerLabel.text = "圆角: ${savedCorner.toInt()}dp"
-
-        val maxCharsSeek = page.findViewById<SeekBar>(R.id.max_chars_seek)
-        val maxCharsLabel = page.findViewById<TextView>(R.id.max_chars_label)
-        val savedMaxChars = WidgetPrefs.getMaxChars(this)
-        maxCharsSeek.progress = ((savedMaxChars - 20) / 380f * 100).toInt().coerceIn(0, 100)
-        maxCharsLabel.text = "小组件最多显示: ${savedMaxChars}字"
 
         val savedColor = WidgetPrefs.getTextColor(this)
         for ((color, name) in presetColors) {
@@ -121,6 +118,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        input.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                charCount.text = "${s.length}/100"
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
         page.findViewById<Button>(R.id.btn_apply_style).setOnClickListener {
             updateWidget()
             Toast.makeText(this, "样式已应用", Toast.LENGTH_SHORT).show()
@@ -148,19 +153,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        maxCharsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(s: SeekBar, p: Int, fromUser: Boolean) {
-                val chars = (20 + p / 100f * 380).toInt()
-                maxCharsLabel.text = "小组件最多显示: ${chars}字"
-            }
-            override fun onStartTrackingTouch(s: SeekBar) {}
-            override fun onStopTrackingTouch(s: SeekBar) {
-                val chars = (20 + s.progress / 100f * 380).toInt()
-                WidgetPrefs.setMaxChars(this@MainActivity, chars)
-                updateWidget()
-            }
-        })
-
         loadQuotes(listContainer, statsText)
     }
 
@@ -175,10 +167,17 @@ class MainActivity : AppCompatActivity() {
                     item.findViewById<TextView>(R.id.quote_text).text = q.text
                     item.findViewById<TextView>(R.id.quote_meta).text = "#${q.id}  ${q.created_at}"
                     item.findViewById<ImageView>(R.id.btn_delete).setOnClickListener {
-                        thread {
-                            QuoteApi.delete(q.id)
-                            runOnUiThread { loadQuotes(listContainer, statsText) }
-                        }
+                        AlertDialog.Builder(this@MainActivity)
+                            .setTitle("删除确认")
+                            .setMessage("确定要删除这条句子吗？")
+                            .setPositiveButton("删除") { _, _ ->
+                                thread {
+                                    QuoteApi.delete(q.id)
+                                    runOnUiThread { loadQuotes(listContainer, statsText) }
+                                }
+                            }
+                            .setNegativeButton("取消", null)
+                            .show()
                     }
                     item.findViewById<ImageView>(R.id.btn_edit).setOnClickListener {
                         showEditDialog(q.id, q.text, listContainer, statsText)
@@ -289,10 +288,17 @@ class MainActivity : AppCompatActivity() {
                         cb.isChecked = !cb.isChecked
                     }
                     delBtn.setOnClickListener {
-                        thread {
-                            QuoteApi.deleteSchedule(s.id)
-                            runOnUiThread { loadSchedules() }
-                        }
+                        AlertDialog.Builder(this@MainActivity)
+                            .setTitle("删除确认")
+                            .setMessage("确定要删除这个日程吗？")
+                            .setPositiveButton("删除") { _, _ ->
+                                thread {
+                                    QuoteApi.deleteSchedule(s.id)
+                                    runOnUiThread { loadSchedules() }
+                                }
+                            }
+                            .setNegativeButton("取消", null)
+                            .show()
                     }
 
                     scheduleContainer.addView(item)
